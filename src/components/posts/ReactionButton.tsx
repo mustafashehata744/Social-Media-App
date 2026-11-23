@@ -44,7 +44,7 @@ export default function ReactionButton({ selected, disabled, onReact }: Props) {
         <ChevronDown size={14} />
       </button>
       {menuOpen && (
-        <div className="absolute bottom-full left-0 z-30 mb-2 flex gap-1 rounded-full border border-line bg-surface p-1.5 shadow-pop">
+        <div className="absolute bottom-full start-0 z-30 mb-2 flex gap-1 rounded-full border border-line bg-surface p-1.5 shadow-pop">
           {reactions.map(({ kind, label, emoji }) => (
             <button
               key={kind}
