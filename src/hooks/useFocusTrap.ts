@@ -8,7 +8,7 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean
     if (!active || !node) return
     const previous = document.activeElement as HTMLElement | null
     const items = () => Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE))
-    items()[0]?.focus()
+    ;(items()[0] ?? node).focus({ preventScroll: true })
 
     const handleKey = (event: KeyboardEvent) => {
       if (event.key !== 'Tab') return

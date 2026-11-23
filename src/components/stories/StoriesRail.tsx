@@ -7,6 +7,7 @@ import Modal from '@/components/ui/Modal'
 import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { useToast } from '@/context/ToastContext'
+import { useBodyScrollLock } from '@/hooks/useBodyScrollLock'
 import { useDataVersion } from '@/hooks/useDataVersion'
 import { relativeTime } from '@/lib/storage'
 import { cn, safeImageUrl } from '@/lib/utils'
@@ -131,12 +132,7 @@ export default function StoriesRail() {
     return () => window.clearTimeout(timer)
   }, [activeGroup, activeIndex, activeStoryId])
 
-  useEffect(() => {
-    if (!activeGroup) return
-    const previousOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = previousOverflow }
-  }, [activeGroup])
+  useBodyScrollLock(!!activeGroup)
 
   useEffect(() => {
     if (!activeGroup) return
@@ -169,6 +165,13 @@ export default function StoriesRail() {
           <span className="w-full truncate text-center text-[10px] font-bold text-muted">{t('قصتك', 'Your story')}</span>
         </button>
 
+        {groups.some((group) => group.authorId === user.id) && (
+          <button onClick={() => setComposerOpen(true)} className="flex w-[76px] shrink-0 flex-col items-center gap-1.5" aria-label={t('إضافة قصة', 'Add story')}>
+            <span className="grid h-14 w-14 place-items-center rounded-full border-2 border-dashed border-primary/60 bg-primary-soft text-primary"><Plus size={24} /></span>
+            <span className="text-[10px] font-bold text-muted">{t('إضافة قصة', 'Add story')}</span>
+          </button>
+        )}
+
         {groups.filter((group) => group.authorId !== user.id).map((group) => {
           const author = getUser(group.authorId)
           if (!author) return null
@@ -196,13 +199,13 @@ export default function StoriesRail() {
 
       {activeStory && createPortal(
         <div
-          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 p-0 sm:p-4"
+          className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 overscroll-none p-0 sm:p-4"
           onClick={() => setActiveGroup(null)}
           role="dialog"
           aria-modal="true"
           aria-label={t('عرض القصة', 'Story viewer')}
         >
-          <div className="relative flex h-full w-full max-w-[420px] flex-col overflow-hidden bg-gradient-to-br from-slate-800 via-violet-900 to-fuchsia-900 text-white shadow-pop sm:h-[min(94vh,844px)] sm:rounded-3xl" onClick={(event) => event.stopPropagation()}>
+          <div className="relative flex h-full w-full max-w-[420px] flex-col overflow-hidden bg-gradient-to-br from-slate-800 via-violet-900 to-fuchsia-900 text-white shadow-pop sm:h-[min(94dvh,844px)] sm:rounded-3xl" onClick={(event) => event.stopPropagation()}>
             {activeImage && <img src={activeImage} alt="" className="absolute inset-0 h-full w-full object-cover opacity-80" />}
             <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/65" />
             <div className="relative z-10 flex gap-1 px-3 pt-3">
@@ -214,7 +217,7 @@ export default function StoriesRail() {
                 </span>
               ))}
             </div>
-            <header className="relative z-10 flex items-center gap-2 p-4 pr-14">
+            <header className="relative z-10 flex items-center gap-2 px-4 pb-2 pt-16">
               <Avatar user={activeAuthor} size="sm" verified={activeAuthor?.verified} />
               <span className="flex-1 text-sm font-bold">{activeAuthor?.name}</span>
               <span className="text-xs text-white/80">{relativeTime(activeStory.createdAt)}</span>
@@ -234,7 +237,7 @@ export default function StoriesRail() {
                     setComposerOpen(true)
                   }}
                   aria-label={t('إضافة قصة', 'Add story')}
-                  className="absolute left-14 top-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/55 text-white shadow-lg hover:bg-primary"
+                  className="absolute left-[6.75rem] top-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/55 text-white shadow-lg hover:bg-primary"
                 >
                   <Plus size={18} />
                 </button>
@@ -242,7 +245,7 @@ export default function StoriesRail() {
                   onClick={() => void toggleHighlight()}
                   aria-label={t('تمييز القصة', 'Highlight story')}
                   title={t('تمييز القصة في البروفايل', 'Highlight on profile')}
-                  className={cn('absolute left-[4.5rem] top-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/55 text-white shadow-lg hover:bg-amber-500', activeStory.highlight && 'bg-amber-500')}
+                  className={cn('absolute left-[3.75rem] top-3 z-20 grid h-10 w-10 place-items-center rounded-full bg-black/55 text-white shadow-lg hover:bg-amber-500', activeStory.highlight && 'bg-amber-500')}
                 >
                   <Star size={18} fill={activeStory.highlight ? 'currentColor' : 'none'} />
                 </button>
