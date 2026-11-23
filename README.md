@@ -5,6 +5,24 @@
 
 > **تنبيه مهم:** المشروع غير جاهز بعد كمنتج متكامل. رمز جلسة API يُخزَّن في `sessionStorage` (يُمسح بإغلاق التبويب)، وبيانات المستخدم المؤقتة في `localStorage`، وبعض الميزات ما زالت محلية. لا تستخدم بيانات حقيقية قبل إعداد المصادقة والتخزين الآمنين على الخادم. أثناء الجلسة المحلية يظهر شعار «وضع تجريبي» في الشريط العلوي.
 
+## الديمو المباشر
+
+**https://mustafashehata744.github.io/Social-Media-App/**
+
+حساب تجريبي جاهز: `ahmed@tawasol.com` / `123456`
+
+## لقطات من التطبيق
+
+<p align="center">
+  <img src="public/img/feed-desktop-light.jpg" alt="الصفحة الرئيسية على الكمبيوتر — الوضع الفاتح" width="49%" />
+  <img src="public/img/feed-desktop-dark.jpg" alt="الصفحة الرئيسية على الكمبيوتر — الوضع الداكن" width="49%" />
+</p>
+<p align="center">
+  <img src="public/img/feed-mobile-light.jpg" alt="الصفحة الرئيسية على الموبايل" width="32%" />
+  <img src="public/img/messages-mobile-light.jpg" alt="المحادثات على الموبايل" width="32%" />
+  <img src="public/img/profile-mobile-light.jpg" alt="الملف الشخصي على الموبايل" width="32%" />
+</p>
+
 ## التشغيل
 
 ```bash

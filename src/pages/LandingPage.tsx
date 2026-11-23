@@ -19,6 +19,8 @@ export default function LandingPage() {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
+  const shot = (name: string) => `${import.meta.env.BASE_URL}img/${name}`
+
   return (
     <div className="min-h-screen bg-canvas">
       <header className="sticky top-0 z-50 border-b border-line/70 bg-surface/90 backdrop-blur-md">
@@ -26,6 +28,7 @@ export default function LandingPage() {
           <Logo />
           <nav className="mr-auto hidden items-center gap-6 text-sm font-bold text-muted md:flex">
             <button type="button" onClick={() => scrollToSection('features')} className="hover:text-primary">{t('المزايا', 'Features')}</button>
+            <button type="button" onClick={() => scrollToSection('screenshots')} className="hover:text-primary">{t('لقطات', 'Screenshots')}</button>
             <button type="button" onClick={() => scrollToSection('demo')} className="hover:text-primary">{t('جرّب الآن', 'Try it')}</button>
           </nav>
           <ThemeToggle className="hidden sm:grid" />
@@ -107,6 +110,25 @@ export default function LandingPage() {
                   <p className="mt-2 text-sm leading-relaxed text-muted">{text}</p>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="screenshots" className="py-16">
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-extrabold text-ink">{t('شوف التطبيق من جوّه', 'See the app from the inside')}</h2>
+              <p className="mt-2 text-muted">{t('لقطات حقيقية من تواصل على الكمبيوتر والموبايل، بالوضع الفاتح والداكن', 'Real screenshots of Tawasol on desktop and mobile, in light and dark mode')}</p>
+            </div>
+            <div className="relative mx-auto max-w-4xl sm:mb-16">
+              <img src={shot('feed-desktop-light.jpg')} alt={t('الصفحة الرئيسية لتواصل على الكمبيوتر بالوضع الفاتح', 'Tawasol home feed on desktop in light mode')} loading="lazy" className="w-full rounded-2xl border border-line shadow-pop dark:hidden" />
+              <img src={shot('feed-desktop-dark.jpg')} alt={t('الصفحة الرئيسية لتواصل على الكمبيوتر بالوضع الداكن', 'Tawasol home feed on desktop in dark mode')} loading="lazy" className="hidden w-full rounded-2xl border border-line shadow-pop dark:block" />
+              <img src={shot('feed-mobile-light.jpg')} alt={t('الصفحة الرئيسية لتواصل على الموبايل', 'Tawasol home feed on mobile')} loading="lazy" className="absolute -bottom-12 right-4 hidden w-28 rotate-2 rounded-[1.4rem] border-4 border-surface shadow-pop sm:block lg:w-36" />
+              <img src={shot('messages-mobile-light.jpg')} alt={t('المحادثات في تواصل على الموبايل', 'Tawasol messages on mobile')} loading="lazy" className="absolute -bottom-12 left-4 hidden w-28 -rotate-2 rounded-[1.4rem] border-4 border-surface shadow-pop sm:block lg:w-36" />
+            </div>
+            <div className="mt-8 grid grid-cols-2 gap-4 sm:hidden">
+              <img src={shot('feed-mobile-light.jpg')} alt={t('الصفحة الرئيسية لتواصل على الموبايل', 'Tawasol home feed on mobile')} loading="lazy" className="w-full rounded-2xl border border-line shadow-pop" />
+              <img src={shot('messages-mobile-light.jpg')} alt={t('المحادثات في تواصل على الموبايل', 'Tawasol messages on mobile')} loading="lazy" className="w-full rounded-2xl border border-line shadow-pop" />
             </div>
           </div>
         </section>

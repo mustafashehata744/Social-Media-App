@@ -138,7 +138,7 @@ export default function MessagesPage() {
   })
 
   return (
-    <div className="card flex h-[calc(100vh-8.5rem)] min-h-[480px] overflow-hidden">
+    <div className="card flex h-[calc(100dvh-12rem)] min-h-[480px] overflow-hidden md:h-[calc(100dvh-8.5rem)]">
       <aside className={cn('w-full shrink-0 flex-col border-line md:flex md:w-80 md:border-l', active ? 'hidden' : 'flex')}>
         <div className="border-b border-line p-3">
           <h1 className="mb-1 px-1 text-lg font-extrabold text-ink">{t('الرسائل', 'Messages')}</h1>
