@@ -10,6 +10,7 @@ import { uid } from '@/lib/storage'
 import { cn } from '@/lib/utils'
 import { clearDraft, getDraft, saveDraft } from '@/services/drafts.service'
 import { createPost } from '@/services/posts.service'
+import { isApiMode } from '@/services/auth.service'
 import { generatePostIdea, improvePost, translateText } from '@/services/ai'
 import type { Poll } from '@/types'
 
@@ -29,6 +30,9 @@ export default function PostComposer({ onCreated }: { onCreated: () => void }) {
   const [pollQuestion, setPollQuestion] = useState('')
   const [pollOptions, setPollOptions] = useState(['', ''])
   const feelings = ['', t('سعيد 😊', 'Happy 😊'), t('متحمس 🎉', 'Excited 🎉'), t('مفكر 🤔', 'Thoughtful 🤔'), t('ممتن 🙏', 'Grateful 🙏')]
+  // Polls are stored locally only; the posts API has no poll contract yet,
+  // so the option is hidden while connected to the server.
+  const pollsAvailable = !isApiMode()
 
   useEffect(() => {
     const timer = window.setTimeout(() => saveDraft(draftKey, content), 450)
@@ -125,7 +129,7 @@ export default function PostComposer({ onCreated }: { onCreated: () => void }) {
         </div>
       )}
 
-      {pollOpen && (
+      {pollsAvailable && pollOpen && (
         <div className="mt-3 space-y-2 rounded-2xl border border-line bg-surface-2/50 p-3">
           <input value={pollQuestion} onChange={(event) => setPollQuestion(event.target.value)} placeholder={t('سؤال الاستطلاع', 'Poll question')} className="input py-2 text-xs" aria-label={t('سؤال الاستطلاع', 'Poll question')} />
           {pollOptions.map((option, index) => (
@@ -168,9 +172,11 @@ export default function PostComposer({ onCreated }: { onCreated: () => void }) {
           <ImagePlus size={17} /> {t('صور', 'Photos')} {images.length > 0 && `(${images.length})`}
         </button>
 
-        <button onClick={() => setPollOpen((value) => !value)} className={cn('btn-ghost !px-3', pollOpen && 'text-primary')} aria-pressed={pollOpen}>
-          <BarChart3 size={17} /> {t('استطلاع', 'Poll')}
-        </button>
+        {pollsAvailable && (
+          <button onClick={() => setPollOpen((value) => !value)} className={cn('btn-ghost !px-3', pollOpen && 'text-primary')} aria-pressed={pollOpen}>
+            <BarChart3 size={17} /> {t('استطلاع', 'Poll')}
+          </button>
+        )}
 
         <label className="btn-ghost !px-3 cursor-pointer">
           <Smile size={17} />

@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import TopBar from './TopBar'
 import MobileNav from './MobileNav'
 import RightSidebar from './RightSidebar'
@@ -12,6 +12,10 @@ export default function AppLayout() {
   const { user } = useAuth()
   const version = useDataVersion()
   const userId = user?.id
+  const { pathname } = useLocation()
+  // The floating assistant overlaps the message composer on small screens,
+  // so it stays available on every page except the messages view.
+  const hideAssistant = pathname.startsWith('/messages')
 
   useEffect(() => {
     const selected = userId ? getSettingsSync(userId).background ?? 'default' : 'default'
@@ -33,7 +37,7 @@ export default function AppLayout() {
         </aside>
       </div>
       <MobileNav />
-      <AIChatWidget />
+      {!hideAssistant && <AIChatWidget />}
     </div>
   )
 }

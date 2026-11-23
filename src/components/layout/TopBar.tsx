@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext'
 import { useLanguage } from '@/context/LanguageContext'
 import { unreadCount } from '@/services/notifications.service'
 import { unreadMessagesCount } from '@/services/messages.service'
+import { isApiMode } from '@/services/auth.service'
 import { useDataVersion } from '@/hooks/useDataVersion'
 import { cn } from '@/lib/utils'
 
@@ -43,6 +44,14 @@ export default function TopBar() {
     <header className="sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center gap-3 px-3 sm:px-5">
         <NavLink to="/feed" className="shrink-0"><Logo /></NavLink>
+        {!isApiMode() && (
+          <span
+            className="shrink-0 rounded-full border border-amber-500/30 bg-amber-500/10 px-2 py-0.5 text-[10px] font-extrabold text-amber-500"
+            title={t('البيانات في هذه الجلسة محلية على جهازك، مش متصلة بالخادم', 'Data in this session is stored locally on your device, not connected to the server')}
+          >
+            {t('وضع تجريبي', 'Demo mode')}
+          </span>
+        )}
 
         <div className="flex-1"><CommandPalette /></div>
 

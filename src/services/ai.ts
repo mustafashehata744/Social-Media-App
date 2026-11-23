@@ -1,5 +1,3 @@
-import { delay } from '@/lib/storage'
-
 interface ChatCompletionResponse {
   choices?: Array<{ message?: { content?: string } }>
   error?: { message?: string }
@@ -9,6 +7,9 @@ interface ChatCompletionResponse {
 const AI_API_URL = (import.meta.env.VITE_AI_API_URL || '') as string
 const AI_MODEL = (import.meta.env.VITE_AI_MODEL || 'gpt-4o-mini') as string
 const AI_NOT_CONFIGURED = 'AI_NOT_CONFIGURED'
+
+/** User-facing message when no AI proxy is configured. Never fake a model response. */
+const AI_UNAVAILABLE_MESSAGE = 'مساعد الذكاء الاصطناعي غير مُعدّ بعد في هذه النسخة. أضف رابط وسيط آمن في VITE_AI_API_URL لتفعيله.'
 
 async function requestAI(system: string, prompt: string): Promise<string> {
   if (!AI_API_URL) throw new Error(AI_NOT_CONFIGURED)
@@ -51,21 +52,6 @@ async function requestAI(system: string, prompt: string): Promise<string> {
   }
 }
 
-const waitForText = (text: string) => delay(Math.min(1900, 600 + text.length * 12))
-
-const ideas = [
-  'اليوم تذكّرت إن الإنجازات الكبيرة ما بتجيش فجأة… بتبدأ بخطوة صغيرة كل يوم. إيه أصغر خطوة عملتهااليوم وفتحت لك باب جديد؟ 🌱',
-  'ثلاث أشياء أدهشتني هذا الأسبوع:\n١. محادثة مع شخص مختلف تمامًا عني.\n٢. كتاب بدأته من غير تخطيط.\n٣. لحظة صمت بدون هاتف 📵\nأنتم إيه اللي ألهمكم؟',
-  'عمل تطوعي صغير في حيّك ممكن يغيّر يوم حد كامل. جرّبت قبل كدة؟ شاركنا التجربة 👇',
-  'سؤال صريح: لو عندك ساعة إضافية كل يوم، هتقضيها في إيه؟ إجاباتكم بتلهمني جدًا ✨',
-]
-
-const improvements: Array<{ match: RegExp; output: string }> = [
-  { match: /عملت|سويت|أنجزت/i, output: 'أنا فخور جدًا بما أنجزته اليوم! كانت رحلة مليئة بالتحديات، لكن النتيجة تستحق كل لحظة. شكرًا لكل من دعمني في الطريق 🙏' },
-  { match: /حزن|تعب|إحباط|زعلان/i, output: 'مرّ اليوم ببعض اللحظات الصعبة، لكني أؤمن إن كل تجربة بتعلّمني شيئًا جديدًا. خفت شوية، بس رجعت أقف من جديد 💪' },
-  { match: /صباح|مساء/i, output: 'صباح الخير يا أصدقاء ☀️ أتمنى لكم يومًا مليئًا بالطاقة والإنجاز. ابدأوه بابتسامة، فالخطوة دايمًا أصغر مما يبدو 😊' },
-]
-
 export async function generatePostIdea(topic = ''): Promise<string> {
   const clean = topic.trim()
   try {
@@ -74,12 +60,8 @@ export async function generatePostIdea(topic = ''): Promise<string> {
       clean ? `اقترح منشورًا جذابًا لموضوع: ${clean}` : 'اقترح فكرة منشور اجتماعي جذابة ومختلفة عن يوميات أو إنجازات أو مجتمع.',
     )
   } catch (error) {
-    await waitForText(topic || 'فكرة')
     if (error instanceof Error && error.message === AI_NOT_CONFIGURED) {
-      const picked = ideas[Math.floor(Math.random() * ideas.length)]
-      return clean
-        ? `بمناسبة الحديث عن «${clean}»…\n${picked}\n\nما رأيكم أنتم؟ #تواصل`
-        : picked
+      throw new Error(AI_UNAVAILABLE_MESSAGE, { cause: error })
     }
     throw error
   }
@@ -93,11 +75,10 @@ export async function improvePost(text: string): Promise<string> {
       text.trim(),
     )
   } catch (error) {
-    await waitForText(text)
-    if (!(error instanceof Error) || error.message !== AI_NOT_CONFIGURED) throw error
-    const hit = improvements.find((item) => item.match.test(text))
-    const base = hit?.output ?? `${text.trim().replace(/[.!؟]+$/, '')} — وهذه لحظة تستحق أن تُروى. شاركوني رأيكم في التعليقات 💬`
-    return base.replace('نحن', 'إحنا')
+    if (error instanceof Error && error.message === AI_NOT_CONFIGURED) {
+      throw new Error(AI_UNAVAILABLE_MESSAGE, { cause: error })
+    }
+    throw error
   }
 }
 
@@ -111,12 +92,11 @@ export async function translateText(text: string, target: 'ar' | 'en'): Promise<
       text.trim(),
     )
   } catch (error) {
-    await waitForText(text)
     if (!(error instanceof Error) || error.message !== AI_NOT_CONFIGURED) throw error
     if (target === 'ar') {
-      return 'الترجمة غير متاحة حاليًا لأن مفتاح الذكاء الاصطناعي لم يُربط بعد.'
+      return 'الترجمة غير متاحة حاليًا لأن مساعد الذكاء الاصطناعي لم يُعدّ بعد.'
     }
-    return 'Translation is unavailable until an AI API key or secure proxy is configured.'
+    return 'Translation is unavailable until a secure AI proxy is configured.'
   }
 }
 
@@ -128,9 +108,10 @@ export async function summarizeComments(comments: string[]): Promise<string> {
       comments.map((comment, index) => `${index + 1}. ${comment}`).join('\n'),
     )
   } catch (error) {
-    await waitForText(comments.join(' '))
-    if (!(error instanceof Error) || error.message !== AI_NOT_CONFIGURED) throw error
-    return `ملخّص ${comments.length} تعليق:\n• يتضمن النقاش آراء متعددة حول المحتوى.\n• قد تحتاج متابعة الأسئلة المرتبطة بالتفاصيل.\n• يُقترح الرد باختصار وطلب رأي إضافي من الجمهور.`
+    if (error instanceof Error && error.message === AI_NOT_CONFIGURED) {
+      throw new Error(AI_UNAVAILABLE_MESSAGE, { cause: error })
+    }
+    throw error
   }
 }
 
@@ -146,13 +127,10 @@ export async function suggestReplies(postContent: string): Promise<string[]> {
       .filter(Boolean)
       .slice(0, 3)
   } catch (error) {
-    await waitForText(postContent)
-    if (!(error instanceof Error) || error.message !== AI_NOT_CONFIGURED) throw error
-    return [
-      'فكرة جميلة جدًا! شكرًا لمشاركتها معنا 🙌',
-      'أتفق معك تمامًا، خصوصًا النقطة الأخيرة. ممكن تشاركنا المزيد؟',
-      'ألهمتني اليوم، منتظرين المزيد منك ✨',
-    ]
+    if (error instanceof Error && error.message === AI_NOT_CONFIGURED) {
+      throw new Error(AI_UNAVAILABLE_MESSAGE, { cause: error })
+    }
+    throw error
   }
 }
 
@@ -171,10 +149,12 @@ export async function chatWithBot(message: string): Promise<string> {
       message.trim(),
     )
   } catch (error) {
-    await waitForText(message)
     if (!(error instanceof Error) || error.message !== AI_NOT_CONFIGURED) throw error
+    // Rule-based fallback for the demo build. Always labeled so nobody mistakes it
+    // for a real model response.
     const rule = botRules.find((item) => item.match.test(message))
-    return rule?.reply ??
-      'المساعد يحتاج إعدادًا حقيقيًا للذكاء الاصطناعي. أضف مفتاح OpenAI أو رابط وسيط آمن في إعدادات المشروع، ثم أستطيع الرد والإبداع بدون قوالب ثابتة.'
+    const fallback = rule?.reply ??
+      'المساعد يحتاج إعدادًا حقيقيًا للذكاء الاصطناعي. أضف رابط وسيط آمن في VITE_AI_API_URL بإعدادات المشروع، وبعدها أقدر أرد بحرية بدون قوالب ثابتة.'
+    return `🧪 رد تجريبي (المساعد الحقيقي غير مُعدّ بعد):\n${fallback}`
   }
 }

@@ -141,7 +141,10 @@ export default function MessagesPage() {
     <div className="card flex h-[calc(100vh-8.5rem)] min-h-[480px] overflow-hidden">
       <aside className={cn('w-full shrink-0 flex-col border-line md:flex md:w-80 md:border-l', active ? 'hidden' : 'flex')}>
         <div className="border-b border-line p-3">
-          <h1 className="mb-3 px-1 text-lg font-extrabold text-ink">{t('الرسائل', 'Messages')}</h1>
+          <h1 className="mb-1 px-1 text-lg font-extrabold text-ink">{t('الرسائل', 'Messages')}</h1>
+          <p className="mb-3 px-1 text-[10px] leading-relaxed text-muted">
+            {t('محادثات تجريبية محفوظة على جهازك فقط، وعلامات التسليم والقراءة محاكاة.', 'Demo conversations stored on this device only; delivery and read receipts are simulated.')}
+          </p>
           <div className="relative">
             <Search size={16} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
             <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={t('ابحث في المحادثات', 'Search conversations')} className="input py-2 pr-9 text-xs" />

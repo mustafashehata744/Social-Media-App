@@ -38,6 +38,12 @@ export default function AIChatWidget() {
         ? await translateText(clean, 'en')
         : await chatWithBot(clean)
       setMessages((items) => [...items, { id: ++idCounter, role: 'bot', text: reply }])
+    } catch {
+      setMessages((items) => [...items, {
+        id: ++idCounter,
+        role: 'bot',
+        text: t('حصل خطأ أثناء الاتصال بالمساعد. تأكد من الإنترنت وحاول مرة أخرى.', 'Something went wrong while contacting the assistant. Check your connection and try again.'),
+      }])
     } finally {
       setTyping(false)
     }

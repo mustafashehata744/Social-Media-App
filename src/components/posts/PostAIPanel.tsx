@@ -15,11 +15,15 @@ export default function PostAIPanel({ post, onPickReply }: Props) {
   const [busy, setBusy] = useState(false)
   const [summary, setSummary] = useState('')
   const [replies, setReplies] = useState<string[]>([])
+  const [error, setError] = useState('')
 
   async function run(task: () => Promise<void>) {
     setBusy(true)
+    setError('')
     try {
       await task()
+    } catch (cause) {
+      setError((cause as Error).message)
     } finally {
       setBusy(false)
     }
@@ -35,6 +39,7 @@ export default function PostAIPanel({ post, onPickReply }: Props) {
         <button onClick={suggest} className="btn-secondary !px-3 !py-2 !text-xs" disabled={busy}>{t('اقتراح ردود', 'Suggest replies')}</button>
         {busy && <TypingDots className="mr-auto" label={t('المساعد بيكتب...', 'Assistant is typing...')} />}
       </div>
+      {error && <p className="mt-3 rounded-xl border border-rose-500/25 bg-rose-500/10 p-3 text-xs font-bold text-rose-500">{error}</p>}
       {summary && <p className="mt-3 whitespace-pre-line rounded-xl bg-surface p-3 text-xs leading-relaxed text-ink">{summary}</p>}
       {replies.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">

@@ -126,22 +126,32 @@ export async function login(email: string, password: string): Promise<User> {
   if (localCredentialsMatch(email, password)) return loginLocal(email, password)
 
   try {
-    const payload = await apiRequest<AuthApiPayload>('/users/signin', {
-      method: 'POST',
-      body: JSON.stringify({ login: email.trim(), email: email.trim(), password }),
-    })
-    const { token, user: apiUser } = resolveAuthPayload(payload)
-    if (!token) throw new Error(pick('لم يرجع الخادم رمز تسجيل الدخول', 'The server did not return a login token'))
-    if (!apiUser || typeof apiUser !== 'object') throw new Error(pick('لم يرجع الخادم بيانات المستخدم', 'The server did not return user data'))
-    const serverUser = apiUserToUser(apiUser)
-    const cachedUser = getCachedApiUser()
-    setApiToken(token)
-    remove(KEYS.session)
-    return cacheApiUser(mergeApiUser(serverUser, cachedUser))
+    return await loginWithApi(email, password)
   } catch (error) {
     if (localCredentialsMatch(email, password)) return loginLocal(email, password)
     throw error
   }
+}
+
+/** Signs in against the remote API and caches the returned session. Exported for direct API-path tests. */
+export async function loginWithApi(email: string, password: string): Promise<User> {
+  const payload = await apiRequest<AuthApiPayload>('/users/signin', {
+    method: 'POST',
+    body: JSON.stringify({ login: email.trim(), email: email.trim(), password }),
+  })
+  const { token, user: apiUser } = resolveAuthPayload(payload)
+  if (!token) throw new Error(pick('لم يرجع الخادم رمز تسجيل الدخول', 'The server did not return a login token'))
+  if (!apiUser || typeof apiUser !== 'object') throw new Error(pick('لم يرجع الخادم بيانات المستخدم', 'The server did not return user data'))
+  const serverUser = apiUserToUser(apiUser)
+  const cachedUser = getCachedApiUser()
+  setApiToken(token)
+  remove(KEYS.session)
+  return cacheApiUser(mergeApiUser(serverUser, cachedUser))
+}
+
+/** True when the active session came from the remote API rather than the local demo data. */
+export function isApiMode(): boolean {
+  return !read<{ userId: string } | null>(KEYS.session, null) && !!getApiToken()
 }
 
 export async function loginLocal(email: string, password: string): Promise<User> {
@@ -184,6 +194,14 @@ export async function register(input: RegisterInput): Promise<User> {
   }
   if (input.password !== input.confirmPassword) throw new Error(pick('تأكيد كلمة المرور غير مطابق', 'Passwords do not match'))
 
+  return registerWithApi(input)
+}
+
+/** Registers against the remote API. Exported for direct API-path tests. */
+export async function registerWithApi(input: RegisterInput): Promise<User> {
+  const name = input.name.trim()
+  const username = (input.username || name).trim().toLowerCase()
+  const email = input.email.trim().toLowerCase()
   const payload = await apiRequest<AuthApiPayload>('/users/signup', {
     method: 'POST',
     body: JSON.stringify({

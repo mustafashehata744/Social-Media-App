@@ -1,0 +1,79 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { resetDB } from './db'
+import { getCurrentUser, isApiMode, loginWithApi, logout, registerWithApi } from './auth.service'
+import { API_TOKEN_KEY, getApiToken } from '@/lib/api'
+
+const apiUser = {
+  id: 'api-1',
+  name: 'Mustafa',
+  email: 'mustafa@example.com',
+  profilePhoto: 'data:image/jpeg;base64,photo',
+}
+
+function mockFetchOnce(status: number, body: unknown) {
+  return vi.fn(async () => new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  }))
+}
+
+beforeEach(() => {
+  localStorage.clear()
+  sessionStorage.clear()
+  resetDB()
+})
+
+afterEach(() => {
+  vi.unstubAllGlobals()
+})
+
+describe('auth.service API path', () => {
+  it('logs in through the API, stores the token in sessionStorage, and exposes the API user', async () => {
+    vi.stubGlobal('fetch', mockFetchOnce(200, { token: 'api-token-1', user: apiUser }))
+
+    const user = await loginWithApi('mustafa@example.com', 'Secret1!')
+
+    expect(user.id).toBe('api-1')
+    expect(getApiToken()).toBe('api-token-1')
+    expect(sessionStorage.getItem(API_TOKEN_KEY)).toBe('api-token-1')
+    expect(localStorage.getItem(API_TOKEN_KEY)).toBeNull()
+    expect(getCurrentUser()?.id).toBe('api-1')
+    expect(isApiMode()).toBe(true)
+
+    logout()
+    expect(getApiToken()).toBeNull()
+    expect(getCurrentUser()).toBeNull()
+    expect(isApiMode()).toBe(false)
+  })
+
+  it('rejects when the server returns no token', async () => {
+    vi.stubGlobal('fetch', mockFetchOnce(200, { user: apiUser }))
+
+    await expect(loginWithApi('mustafa@example.com', 'Secret1!')).rejects.toThrow()
+    expect(getApiToken()).toBeNull()
+  })
+
+  it('propagates server error messages', async () => {
+    vi.stubGlobal('fetch', mockFetchOnce(401, { message: 'invalid credentials' }))
+
+    await expect(loginWithApi('mustafa@example.com', 'wrong')).rejects.toThrow('invalid credentials')
+    expect(getApiToken()).toBeNull()
+  })
+
+  it('registers through the API and starts an API session', async () => {
+    vi.stubGlobal('fetch', mockFetchOnce(200, { token: 'api-token-2', user: apiUser }))
+
+    const user = await registerWithApi({
+      name: 'Mustafa',
+      email: 'mustafa@example.com',
+      password: 'Secret1!',
+      confirmPassword: 'Secret1!',
+      dateOfBirth: '2005-06-12',
+      gender: 'male',
+    })
+
+    expect(user.id).toBe('api-1')
+    expect(getApiToken()).toBe('api-token-2')
+    expect(isApiMode()).toBe(true)
+  })
+})

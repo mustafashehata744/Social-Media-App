@@ -281,6 +281,14 @@ export async function createPost(
   }
 
   if (!localSession && getApiToken()) {
+    // The posts API contract has no poll field; polls are a local demo feature.
+    // Refuse loudly instead of silently dropping the poll the user just wrote.
+    if (poll) {
+      throw new Error(pick(
+        'الاستطلاعات غير متاحة أثناء الربط بالخادم حاليًا. انشر بدون استطلاع، أو جرّبها من حساب تجريبي محلي.',
+        'Polls are not available while connected to the server yet. Publish without the poll, or try it from a local demo account.',
+      ))
+    }
     const requestPayload: Record<string, unknown> = { body: content.trim(), feeling }
     if (list.length > 0) {
       requestPayload.images = list

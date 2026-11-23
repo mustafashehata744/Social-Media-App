@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { HashRouter, Route, Routes } from 'react-router-dom'
 import { ThemeProvider } from '@/context/ThemeContext'
 import { AuthProvider } from '@/context/AuthContext'
 import { ToastProvider } from '@/context/ToastContext'
@@ -33,7 +33,7 @@ export default function App() {
         <LanguageProvider>
           <ToastProvider>
             <ErrorBoundary>
-              <BrowserRouter>
+              <HashRouter>
                 <Suspense fallback={<div className="grid min-h-screen place-items-center bg-canvas"><Spinner size="lg" /></div>}>
                   <Routes>
                     <Route element={<PublicRoute />}>
@@ -63,7 +63,7 @@ export default function App() {
                     </Route>
                   </Routes>
                 </Suspense>
-              </BrowserRouter>
+              </HashRouter>
             </ErrorBoundary>
           </ToastProvider>
         </LanguageProvider>
