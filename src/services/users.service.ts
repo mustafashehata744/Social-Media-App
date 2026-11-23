@@ -53,10 +53,12 @@ export function cacheApiUsers(apiUsers: User[]): void {
       changed = true
       return
     }
+    // Locally edited fields win over a later server sync, so refetching posts
+    // cannot clobber profile edits made in the app.
     const updated = {
-      ...users[index],
       ...apiUser,
-      joinedAt: apiUser.joinedAt || users[index].joinedAt || new Date().toISOString(),
+      ...users[index],
+      joinedAt: users[index].joinedAt || apiUser.joinedAt || new Date().toISOString(),
     }
     if (JSON.stringify(updated) !== JSON.stringify(users[index])) {
       users[index] = updated
@@ -74,6 +76,12 @@ export async function updateUser(id: string, patch: Partial<User>): Promise<User
   if (apiUser?.id === id) {
     const updated = { ...apiUser, ...patch, id }
     setCachedApiUser(updated)
+    // Persist the edit outside the session cache so logging out does not erase it.
+    const users = read<User[]>(KEYS.users, [])
+    const index = users.findIndex((user) => user.id === id)
+    if (index === -1) users.push(updated)
+    else users[index] = { ...users[index], ...updated, id }
+    write(KEYS.users, users)
     return updated
   }
 

@@ -26,7 +26,7 @@
       same-origin ws/wss connections, and API/AI origins are configured through VITE_* env vars.
       For production, replace this with a stricter nonce/hash-based CSP sent as an HTTP header.
     -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: ws: wss:; media-src 'self' blob: data:; worker-src 'self' blob:; frame-src 'self'; form-action 'self'" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: ws: wss:; media-src 'self' blob: data:; worker-src 'self' blob:; frame-src 'self' https://challenges.cloudflare.com; form-action 'self'" />
   </head>
   <body>
     <div id="root"></div>

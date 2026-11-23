@@ -115,8 +115,12 @@ export function getCurrentUser(): User | null {
 }
 
 function mergeApiUser(apiUser: User, cachedUser: User | null): User {
-  if (!cachedUser || cachedUser.id !== apiUser.id) return apiUser
-  return { ...apiUser, ...cachedUser, id: apiUser.id }
+  // Locally saved edits survive logout, so they take precedence over the
+  // server's copy of the same account.
+  const storedUser = read<User[]>(KEYS.users, []).find((item) => item.id === apiUser.id) || null
+  const base = storedUser ? { ...apiUser, ...storedUser, id: apiUser.id } : apiUser
+  if (!cachedUser || cachedUser.id !== apiUser.id) return base
+  return { ...base, ...cachedUser, id: apiUser.id }
 }
 
 export async function login(email: string, password: string): Promise<User> {

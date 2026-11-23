@@ -76,4 +76,20 @@ describe('auth.service API path', () => {
     expect(getApiToken()).toBe('api-token-2')
     expect(isApiMode()).toBe(true)
   })
+
+  it('keeps profile edits across logout and a fresh API login', async () => {
+    vi.stubGlobal('fetch', mockFetchOnce(200, { token: 'api-token-1', user: apiUser }))
+
+    await loginWithApi('mustafa@example.com', 'Secret1!')
+    const { updateUser } = await import('./users.service')
+    await updateUser('api-1', { bio: 'مطور واجهات', work: 'طالب' })
+
+    logout()
+    expect(getCurrentUser()).toBeNull()
+
+    const user = await loginWithApi('mustafa@example.com', 'Secret1!')
+    expect(user.bio).toBe('مطور واجهات')
+    expect(user.work).toBe('طالب')
+    expect(user.name).toBe('Mustafa')
+  })
 })
