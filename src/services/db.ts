@@ -55,6 +55,18 @@ export function ensureDB(): void {
   if (read<Report[] | null>(KEYS.reports, null) === null) write(KEYS.reports, [])
   if (read<SearchEntry[] | null>(KEYS.searchHistory, null) === null) write(KEYS.searchHistory, [])
 
+  // One-time cleanup: strip withdrawn demo photos from previously seeded browsers
+  const storedPosts = read<Post[]>(KEYS.posts, [])
+  let postsDirty = false
+  const cleanedPosts = storedPosts.map((post) => {
+    const images = (post.images ?? []).filter((src) => !src.includes('demo-post-'))
+    const image = post.image && post.image.includes('demo-post-') ? undefined : post.image
+    if (images.length === (post.images ?? []).length && image === post.image) return post
+    postsDirty = true
+    return { ...post, images, image }
+  })
+  if (postsDirty) write(KEYS.posts, cleanedPosts)
+
   const users = read<User[]>(KEYS.users, [])
   const settings = read<Record<string, UserSettings>>(KEYS.settings, {})
   users.forEach((user) => {

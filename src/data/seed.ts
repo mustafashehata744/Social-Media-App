@@ -7,8 +7,6 @@ import avatar5 from '@/img/demo-avatar-5.jpg'
 import avatar6 from '@/img/demo-avatar-6.jpg'
 import avatar7 from '@/img/demo-avatar-7.jpg'
 import avatar8 from '@/img/demo-avatar-8.jpg'
-import postPhoto1 from '@/img/demo-post-1.jpg'
-import postPhoto2 from '@/img/demo-post-2.jpg'
 
 const ago = (minutes: number) => new Date(Date.now() - minutes * 60_000).toISOString()
 
@@ -126,12 +124,12 @@ export const seedPosts: Post[] = [
   { id: 'p12', authorId: 'u14', content: 'شاركت في جلسة موسيقية صغيرة مع أصدقاء جدد. لحظات بسيطة بس بتفضل في الذاكرة 🎶', createdAt: ago(60 * 92), likes: ['u1', 'u6', 'u11'], comments: [{ id: 'c15', postId: 'p12', authorId: 'u7', content: 'يا سلام! نفسي أسمع تسجيل منها 🎵', createdAt: ago(60 * 90), likes: [] }], shares: 2 },
   { id: 'p13', authorId: 'u5', content: 'مباراة قوية ومليانة حماس اليوم! الرياضة بتجمع الناس مهما اختلفت اهتماماتهم ⚽', createdAt: ago(60 * 110), likes: ['u1', 'u3', 'u12'], comments: [{ id: 'c16', postId: 'p13', authorId: 'u12', content: 'كانت مباراة ممتعة فعلًا 🔥', createdAt: ago(60 * 105), likes: ['u5'] }], shares: 3 },
   { id: 'p14', authorId: 'u6', content: 'كل رحلة بتعلمني حاجة جديدة عن العالم وعن نفسي. ممتنة لكل طريق وكل حكاية 🌍', createdAt: ago(60 * 130), likes: ['u2', 'u4', 'u9', 'u13'], comments: [{ id: 'c17', postId: 'p14', authorId: 'u9', content: 'وكل صورة من رحلاتك بتحكي حكاية جميلة 💚', createdAt: ago(60 * 127), likes: ['u6'] }], shares: 6 },
-  { id: 'p15', authorId: 'u3', content: 'لقطة من رحلتنا اليوم. الضوء الطبيعي خلّى اللحظة أحلى من كل المخططات 📸', images: [postPhoto1], createdAt: ago(60 * 145), likes: ['u1', 'u2', 'u13'], comments: [], shares: 2 },
-  { id: 'p16', authorId: 'u7', content: 'تفاصيل من مكان هادي جمعتنا السعي والإلهام. شاركوني رأيكم في التكوين 🎨', images: [postPhoto2], createdAt: ago(60 * 160), likes: ['u4', 'u9', 'u10'], comments: [], shares: 1 },
-  { id: 'p17', authorId: 'u13', content: 'تجربة تصوير جديدة: أبسط زاوية ممكن تحكي حكاية كبيرة!', images: [postPhoto1, postPhoto2], createdAt: ago(60 * 180), likes: ['u3', 'u6', 'u11'], comments: [], shares: 3 },
+  { id: 'p15', authorId: 'u3', content: 'لقطة من رحلتنا اليوم. الضوء الطبيعي خلّى اللحظة أحلى من كل المخططات 📸', createdAt: ago(60 * 145), likes: ['u1', 'u2', 'u13'], comments: [], shares: 2 },
+  { id: 'p16', authorId: 'u7', content: 'تفاصيل من مكان هادي جمعتنا السعي والإلهام. شاركوني رأيكم في التكوين 🎨', createdAt: ago(60 * 160), likes: ['u4', 'u9', 'u10'], comments: [], shares: 1 },
+  { id: 'p17', authorId: 'u13', content: 'تجربة تصوير جديدة: أبسط زاوية ممكن تحكي حكاية كبيرة!', createdAt: ago(60 * 180), likes: ['u3', 'u6', 'u11'], comments: [], shares: 3 },
   { id: 'p18', authorId: 'u8', content: 'خدنا استراحة من الشاشات وشوفنا العالم حوالينا للراحة قبل الرجوع للشغل 🌿', createdAt: ago(60 * 205), likes: ['u1', 'u5', 'u12'], comments: [], shares: 0 },
-  { id: 'p19', authorId: 'u10', content: 'صور من جلسة العمل الجماعي، الحماس الحقيقي بيبان في الأخر يا جماعة 👨‍💻', images: [postPhoto2], createdAt: ago(60 * 230), likes: ['u1', 'u8', 'u14'], comments: [], shares: 4 },
-  { id: 'p20', authorId: 'u14', content: 'ذكرى صغيرة من يوم طويل مليان ضحك ومناقشات حلوة. شاركوا ذكرى مشابهة 🎶', images: [postPhoto1], createdAt: ago(60 * 260), likes: ['u7', 'u9', 'u11'], comments: [], shares: 2 },
+  { id: 'p19', authorId: 'u10', content: 'صور من جلسة العمل الجماعي، الحماس الحقيقي بيبان في الأخر يا جماعة 👨‍💻', createdAt: ago(60 * 230), likes: ['u1', 'u8', 'u14'], comments: [], shares: 4 },
+  { id: 'p20', authorId: 'u14', content: 'ذكرى صغيرة من يوم طويل مليان ضحك ومناقشات حلوة. شاركوا ذكرى مشابهة 🎶', createdAt: ago(60 * 260), likes: ['u7', 'u9', 'u11'], comments: [], shares: 2 },
 ]
 
 export const seedFriendRequests: FriendRequest[] = [
