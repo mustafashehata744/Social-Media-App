@@ -1,0 +1,20 @@
+{
+  "name": "تواصل — تواصل مع من تحب | Tawasol — Connect with your people",
+  "short_name": "تواصل | Tawasol",
+  "description": "منصة اجتماعية عربية للتواصل مع الأصدقاء والأحباء | An Arabic social platform to connect with friends and family",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/feed",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f0f2f5",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

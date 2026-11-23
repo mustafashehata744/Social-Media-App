@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f766e" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#18191a" media="(prefers-color-scheme: dark)" />
+    <meta name="description" content="تواصل — منصة اجتماعية عربية تجمعك بأحبائك وأصدقائك: شارك المنشورات، وتحدث مع أصدقائك، واكتشف ما يهمك." />
+    <title>تواصل — تواصل مع من تحب</title>
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="تواصل | Tawasol" />
+    <meta property="og:title" content="تواصل — تواصل مع من تحب" />
+    <meta property="og:description" content="منصة اجتماعية عربية للتواصل مع الأصدقاء والأحباء، بمشاركة المنشورات والمحادثات وواجهة عربية كاملة." />
+    <meta property="og:image" content="/icons/icon.svg" />
+    <meta name="twitter:card" content="summary" />
+
+    <link rel="icon" type="image/svg+xml" href="/icons/icon.svg" />
+    <link rel="apple-touch-icon" href="/icons/icon.svg" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <!-- public/sw.js is intentionally not registered here; no offline claims are made. -->
+
+    <!--
+      Development note: @vitejs/plugin-react injects an inline module script for React Refresh,
+      so script-src must allow 'unsafe-inline' while using a meta-based CSP. HMR also needs
+      same-origin ws/wss connections, and API/AI origins are configured through VITE_* env vars.
+      For production, replace this with a stricter nonce/hash-based CSP sent as an HTTP header.
+    -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: ws: wss:; media-src 'self' blob: data:; worker-src 'self' blob:; frame-src 'self'; form-action 'self'" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

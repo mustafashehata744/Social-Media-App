@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Tawasol">
+  <defs>
+    <linearGradient id="brand" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0f766e" />
+      <stop offset="1" stop-color="#7c3aed" />
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#brand)" />
+  <path fill="#fff" d="M136 144h240a20 20 0 0 1 0 40H292v180a20 20 0 0 1-20 20h-32a20 20 0 0 1-20-20V184H136a20 20 0 0 1 0-40Z" />
+</svg>
