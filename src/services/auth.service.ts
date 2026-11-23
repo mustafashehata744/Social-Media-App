@@ -5,6 +5,7 @@ import { hashPassword, verifyPassword } from '@/lib/security'
 import { DEMO_RESET_CODE } from '@/data/demo'
 import { defaultSettings } from '@/data/seed'
 import { KEYS, ensureDB } from './db'
+import { persistCachedApiUser } from './users.service'
 import type { Credential, User, UserSettings } from '@/types'
 import {
   apiRequest, clearApiSession, getApiToken, getCachedApiUser, setApiToken, setCachedApiUser,
@@ -110,7 +111,10 @@ export function getCurrentUser(): User | null {
     const user = read<User[]>(KEYS.users, []).find((item) => item.id === session.userId)
     if (user) return user
   }
-  if (getApiToken()) return getCachedApiUser()
+  if (getApiToken()) {
+    persistCachedApiUser()
+    return getCachedApiUser()
+  }
   return null
 }
 

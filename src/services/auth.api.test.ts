@@ -92,4 +92,27 @@ describe('auth.service API path', () => {
     expect(user.work).toBe('طالب')
     expect(user.name).toBe('Mustafa')
   })
+
+  it('rescues edits still sitting in a live session cache from before the fix', async () => {
+    vi.stubGlobal('fetch', mockFetchOnce(200, { token: 'api-token-1', user: apiUser }))
+    await loginWithApi('mustafa@example.com', 'Secret1!')
+
+    // Simulates a pre-fix edit: present only in the session cache, never persisted.
+    const { getCachedApiUser, setCachedApiUser, API_USER_KEY } = await import('@/lib/api')
+    const cached = getCachedApiUser()!
+    setCachedApiUser({ ...cached, bio: 'تعديل قبل الإصلاح' })
+    expect(JSON.parse(localStorage.getItem('tawasol:users') || '[]')
+      .find((item: { id: string }) => item.id === 'api-1')).toBeUndefined()
+
+    // Any app load (getCurrentUser) now copies the live cache into durable storage.
+    expect(getCurrentUser()?.bio).toBe('تعديل قبل الإصلاح')
+    expect(JSON.parse(localStorage.getItem('tawasol:users') || '[]')
+      .find((item: { id: string }) => item.id === 'api-1')?.bio).toBe('تعديل قبل الإصلاح')
+
+    logout()
+    expect(localStorage.getItem(API_USER_KEY)).toBeNull()
+
+    const user = await loginWithApi('mustafa@example.com', 'Secret1!')
+    expect(user.bio).toBe('تعديل قبل الإصلاح')
+  })
 })

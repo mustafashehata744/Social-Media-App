@@ -39,6 +39,22 @@ export function getUser(id: string): User | undefined {
   return read<User[]>(KEYS.users, []).find((item) => item.id === id)
 }
 
+/**
+ * One-time rescue for edits made before logout-safe persistence shipped: a live
+ * session cache still holds them, so copy it into the durable account data.
+ * The cached copy is the newest known state, so it wins over an older stored entry.
+ */
+export function persistCachedApiUser(): void {
+  const apiUser = getCachedApiUser()
+  if (!apiUser?.id) return
+  ensureDB()
+  const users = read<User[]>(KEYS.users, [])
+  const index = users.findIndex((user) => user.id === apiUser.id)
+  if (index === -1) users.push(apiUser)
+  else users[index] = { ...users[index], ...apiUser }
+  write(KEYS.users, users)
+}
+
 export function cacheApiUsers(apiUsers: User[]): void {
   if (apiUsers.length === 0) return
   ensureDB()
