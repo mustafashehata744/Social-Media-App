@@ -94,6 +94,7 @@ export default function CommentList({ post, user, draft, onDraftChange, onChange
 
   return (
     <div className="border-t border-line bg-surface-2/40 p-4 sm:p-5">
+      {post.source === 'api' && <p className="mb-3 text-[11px] text-muted">{t('التعليقات هنا محفوظة في هذا المتصفح فقط.', 'Comments here are saved in this browser only.')}</p>}
       <div className="space-y-3">
         {visible.length === 0 && <p className="text-center text-xs text-muted">{t('كن أول من يعلّق 💬', 'Be the first to comment 💬')}</p>}
         {visible.map((comment) => {
@@ -160,7 +161,8 @@ export default function CommentList({ post, user, draft, onDraftChange, onChange
           value={draft}
           onChange={(event) => onDraftChange(event.target.value)}
           placeholder={t('اكتب تعليقًا...', 'Write a comment...')}
-          className="input flex-1 py-2.5"
+          className="input min-w-0 flex-1 py-2.5"
+          aria-label={t('اكتب تعليقًا', 'Write a comment')}
         />
         <button type="submit" className="btn-primary h-10 w-10 !px-0" disabled={!draft.trim() || sending} aria-label={t('إرسال التعليق', 'Send comment')}>
           <Send size={17} />

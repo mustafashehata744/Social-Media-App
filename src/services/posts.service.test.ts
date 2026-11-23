@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { resetDB } from './db'
-import { addComment, createPost, deletePost, getPost, listPostsPage, setReaction, sharePost } from './posts.service'
+import { addComment, createPost, deleteComment, deletePost, getPost, listPostsPage, setReaction, sharePost } from './posts.service'
 import { setApiToken } from '@/lib/api'
 import { getUser } from './users.service'
 
@@ -100,7 +100,7 @@ describe('posts.service', () => {
     })
   })
 
-  it('uses each API post’s own comment and share totals', async () => {
+  it('counts only available comments, not inaccessible API totals', async () => {
     setApiToken('test-token')
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({
       success: true,
@@ -114,6 +114,17 @@ describe('posts.service', () => {
 
     const result = await listPostsPage('u1')
 
-    expect(result.posts.map(({ commentsCount, shares }) => [commentsCount, shares])).toEqual([[2, 1], [7, 3]])
+    expect(result.posts.map(({ commentsCount, shares }) => [commentsCount, shares])).toEqual([[0, 1], [0, 3]])
   })
 })
+
+ it('keeps real comment counts after add, delete and a fresh read', async () => {
+    const post = await createPost('u_author', 'comment lifecycle')
+    expect(getPost(post.id)?.commentsCount).toBe(0)
+    const comment = await addComment(post.id, 'u_a', 'visible comment')
+    expect(getPost(post.id)?.commentsCount).toBe(1)
+    expect(getPost(post.id)?.comments[0].content).toBe('visible comment')
+    await deleteComment(post.id, comment.id, 'u_a')
+    expect(getPost(post.id)?.commentsCount).toBe(0)
+    await expect(addComment(post.id, 'u_a', '  ')).rejects.toThrow()
+  })

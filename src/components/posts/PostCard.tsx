@@ -17,7 +17,7 @@ import { useToast } from '@/context/ToastContext'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { relativeTime } from '@/lib/storage'
 import { cn, safeImageUrl } from '@/lib/utils'
-import { deletePost, hidePost, setReaction, sharePost, toggleBookmark, unhidePost, updatePost } from '@/services/posts.service'
+import { deletePost, getPost, hidePost, setReaction, sharePost, toggleBookmark, unhidePost, updatePost } from '@/services/posts.service'
 import { getUser } from '@/services/users.service'
 import type { Post, ReactionKind } from '@/types'
 
@@ -63,6 +63,12 @@ export default function PostCard({ post: initialPost, onChange, onRemoved }: Pro
 
   function showError(error: unknown) {
     toast((error as Error).message, 'error')
+  }
+
+  function refreshComments() {
+    const updated = getPost(post.id)
+    if (updated) setPost(updated)
+    onChange()
   }
 
   async function react(reaction: ReactionKind | null) {
@@ -253,7 +259,7 @@ export default function PostCard({ post: initialPost, onChange, onRemoved }: Pro
           {post.likes.length > 0 && <span className="grid h-5 w-5 place-items-center rounded-full bg-primary text-[9px] text-white">♥</span>}
           {post.likes.length} {t('أعجبني', 'likes')}
         </span>
-        <span>{post.commentsCount ?? post.comments.length} {t('تعليق', 'comments')} · {post.shares} {t('مشاركة', 'shares')}</span>
+        <span>{post.comments.length} {t('تعليق', 'comments')} · {post.shares} {t('مشاركة', 'shares')}</span>
       </div>
 
       <div className="grid grid-cols-5 gap-1 p-1.5 sm:p-2">
@@ -265,7 +271,7 @@ export default function PostCard({ post: initialPost, onChange, onRemoved }: Pro
       </div>
 
       {aiOpen && <PostAIPanel post={post} onPickReply={pickReply} />}
-      {commentsOpen && <CommentList post={post} user={user} draft={draft} onDraftChange={setDraft} onChange={onChange} />}
+      {commentsOpen && <CommentList post={post} user={user} draft={draft} onDraftChange={setDraft} onChange={refreshComments} />}
 
       {lightbox !== null && images[lightbox] && (
         <Lightbox images={images} index={lightbox} onIndexChange={setLightbox} onClose={() => setLightbox(null)} />

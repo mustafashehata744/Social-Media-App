@@ -110,10 +110,9 @@ function mapApiPost(apiPost: ApiPost): Post {
         ? [apiPost.image]
         : []
   const comments = apiPost.comments || []
-  const commentsCount = parseCount(apiPost.commentsCount)
-    ?? parseCount(apiPost.commentCount)
-    ?? parseCount(apiPost.comments_count)
-    ?? comments.length
+  // Until remote comment loading/sending is supported, only count the
+  // actual comments available in this browser, never an inaccessible total.
+  const commentsCount = comments.length
   const shares = parseCount(apiPost.shares)
     ?? parseCount(apiPost.sharesCount)
     ?? parseCount(apiPost.shareCount)
@@ -162,7 +161,7 @@ function cacheApiPosts(apiPosts: Post[]): void {
       images: apiPost.images,
       feeling: apiPost.feeling,
       createdAt: apiPost.createdAt || existing.createdAt,
-      commentsCount: apiPost.commentsCount ?? existing.commentsCount,
+      commentsCount: existing.comments.length,
       shares: apiPost.shares,
       source: 'api',
       comments: existing.comments,
@@ -234,7 +233,7 @@ export async function listPostsPage(viewerId: string | undefined, page = 1, limi
 }
 
 function posts(): Post[] {
-  return read<Post[]>(KEYS.posts, [])
+  return read<Post[]>(KEYS.posts, []).map((post) => ({ ...post, commentsCount: post.comments.length }))
 }
 
 export async function listPosts(viewerId?: string): Promise<Post[]> {
@@ -384,6 +383,7 @@ export async function deleteComment(postId: string, commentId: string, authorId:
   const comment = post?.comments.find((item) => item.id === commentId)
   if (!post || !comment || comment.authorId !== authorId) throw new Error(pick('لا تملك صلاحية حذف هذا التعليق', 'You are not allowed to delete this comment'))
   post.comments = post.comments.filter((item) => item.id !== commentId)
+  post.commentsCount = post.comments.length
   write(KEYS.posts, all)
 }
 
@@ -426,6 +426,7 @@ export async function toggleLike(postId: string, userId: string): Promise<Post> 
 
 export async function addComment(postId: string, authorId: string, content: string): Promise<Comment> {
   ensureDB()
+  if (!content.trim()) throw new Error(pick('لا يمكن أن يكون التعليق فارغًا', 'A comment cannot be empty'))
   await delay(280)
   const all = posts()
   const post = all.find((item) => item.id === postId)
