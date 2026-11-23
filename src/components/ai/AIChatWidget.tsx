@@ -65,7 +65,7 @@ export default function AIChatWidget() {
             {messages.map((message) => (
               <div key={message.id} className={cn('flex', message.role === 'user' ? 'justify-start' : 'justify-end')}>
                 {message.role === 'bot' && <Bot size={16} className="ml-2 mt-1 shrink-0 text-primary" />}
-                <p className={cn(
+                <p dir="auto" className={cn(
                   'max-w-[82%] whitespace-pre-line rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed',
                   message.role === 'user'
                     ? 'rounded-br-sm bg-primary text-white'
