@@ -45,3 +45,24 @@ test('fixes model and output cap, returns only response contract', async () => {
     assert.ok(called)
   } finally { globalThis.fetch = original }
 })
+test('invalid and reused challenges never reach inference', async () => {
+  const original = globalThis.fetch
+  let calls = 0
+  globalThis.fetch = async () => Response.json({ success: false, 'error-codes': ['timeout-or-duplicate'] })
+  try {
+    const env = { ...base, AI: { run: async () => { calls++; return { response: 'bad' } } } }
+    assert.equal((await worker.fetch(request({ messages: [{ role: 'user', content: 'hello' }] }), env)).status, 403)
+    assert.equal(calls, 0)
+  } finally { globalThis.fetch = original }
+})
+test('OpenAI-shaped model responses are supported and provider failures stay errors', async () => {
+  const original = globalThis.fetch
+  globalThis.fetch = async () => Response.json({ success: true, hostname: 'mustafashehata744.github.io', action: 'tawasol-ai' })
+  try {
+    const result = await worker.fetch(request({ messages: [{ role: 'user', content: 'hello' }] }), { ...base, AI: { run: async () => ({ choices: [{ message: { content: 'Real response' } }] }) } })
+    assert.equal((await result.json()).choices[0].message.content, 'Real response')
+    const failed = await worker.fetch(request({ messages: [{ role: 'user', content: 'hello' }] }), { ...base, AI: { run: async () => { throw new Error('private provider details') } } })
+    assert.equal(failed.status, 503)
+    assert.ok(!(await failed.text()).includes('private provider'))
+  } finally { globalThis.fetch = original }
+})
