@@ -1,3 +1,5 @@
+import { getAIToken } from './turnstile'
+
 interface ChatCompletionResponse {
   choices?: Array<{ message?: { content?: string } }>
   error?: { message?: string }
@@ -14,11 +16,12 @@ const AI_UNAVAILABLE_MESSAGE = 'مساعد الذكاء الاصطناعي غي�
 async function requestAI(system: string, prompt: string): Promise<string> {
   if (!AI_API_URL) throw new Error(AI_NOT_CONFIGURED)
 
+  const token = await getAIToken()
   const controller = new AbortController()
-  const timeout = window.setTimeout(() => controller.abort(), 30000)
+  const timeout = window.setTimeout(() => controller.abort(), 65000)
 
   try {
-    const headers = new Headers({ 'Content-Type': 'application/json' })
+    const headers = new Headers({ 'Content-Type': 'application/json', 'X-Turnstile-Token': token })
 
     const response = await fetch(AI_API_URL, {
       method: 'POST',

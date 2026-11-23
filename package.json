@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "test": "vitest run"
+    "test": "vitest run && node --test server/cloudflare/security-checks.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.3.0",
